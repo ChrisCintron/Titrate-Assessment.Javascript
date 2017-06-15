@@ -1,8 +1,8 @@
 
 
 #container{
-    height: 700px;
-    width: 1000px;
+    height: 750px;
+    width: 1200px;
     margin: auto;
     background-color: lightblue;
     top: 30px;
@@ -10,8 +10,8 @@
 
 #display{
     position: relative;
-    height: 620px;
-    width: 866px;
+    height: 90%;
+    width: 90%;
     border: 3px solid green;
     margin: auto;
     top: inherit;
@@ -19,20 +19,29 @@
 
 }
 
-
 .console{
     flex-grow: 1;
     border: 3px solid black;
 }
 
-
 .pictures{
-
+    padding-left: 30px;
     height: 80%;
     border: 3px solid red;
+}
+
+.my_images {
+    width: 450px;
+    height: 100%;
 }
 
 .score {
     border: 3px solid blue;
     height: 19%;
+}
+
+h1 {
+    text-align: center;
+    font-size: 60px;
+    margin: auto;
 }
