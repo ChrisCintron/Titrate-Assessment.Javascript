@@ -1,0 +1,22 @@
+
+p {
+    width: inherit;
+}
+
+body {
+    text-align: center;
+}
+
+
+.Menu-Container {
+    height: 200px;
+    width: 320px;
+    margin: 0 auto;
+    padding-top: 150px;
+    /*background-image:url(images/BF_Skinner.jpg);
+    background-position:center;*/
+}
+
+#My_form {
+    text-align: right;
+}
