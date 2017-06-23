@@ -22,16 +22,11 @@
 $(document).ready(function(){
 
     //--Titrate Assessment--//
-    //4 sequences total, with sequence #2 only playing the first day
+    //4 sequences total, with sequence #3 only playing the first day
     //-----------------------//
-    //--To Do--//
-    //Sequence controller
-    //timers to record data on all sequences.
-    //export data to excel sheet
-    //total-time-entry box on menu
-    //Connect first time entry box
-    //switch sides should be an integer (1 or 2)
 
+    //--To Do--//
+    //Moved to bottom
     //////////
 
     var new_data = localStorage.getItem('Entry_Data');
@@ -110,7 +105,6 @@ $(document).ready(function(){
     };
 
     var console_helper = {
-
         console1_shower: function(){
                 $('#console1').fadeIn();
                 $('#score1').fadeIn();
@@ -173,14 +167,12 @@ $(document).ready(function(){
     };
 
     //Sequence #1
-
     var sequence1 = function() {
         general_helper.what_sequence = 1;
         //var blackout_time = blackout;
         //hide both consoles
         $('#console1').fadeOut();
         $('#console2').fadeOut();
-
 
         if (switch_sides == '1') {
             $('#console1').fadeIn();
@@ -190,7 +182,6 @@ $(document).ready(function(){
 
                 setTimeout(function(){ $('#console1').fadeOut(); }, 500);
                 setTimeout(function(){ $('#console2').fadeIn(); }, blackout_time * 1000);
-                //$('#score1').show();
 
                 $('#console2').click(function() {
                     $('#score2').hide();
@@ -243,9 +234,8 @@ $(document).ready(function(){
 
         });
     };
-    //general_helper.bundle_1_start();
 
-    // __SEQUENCE 3 DONE___ //
+    // __SEQUENCE 3___ //
     var seq3_events = {
         //general_helper.what_sequence: 3,
         number_of_trials: 2, //(1) low effort and another high effort
@@ -312,13 +302,8 @@ $(document).ready(function(){
         },
     };
 
-
-
-
-
-
     //Show Gideon in this order
-    switch_sides = '2';
+    //switch_sides = '2';
     //S1 Works
     //S2 broken
     //S3 N?A
@@ -344,8 +329,8 @@ $(document).ready(function(){
 
     //__Sequence_4__
     //Needs to stop after 4 intervals
-    sequence4.init();
-    sequence4.seq();
+    //sequence4.init();
+    //sequence4.seq();
 
     //--To Do--//
     //Sequence controller
@@ -355,18 +340,8 @@ $(document).ready(function(){
     //Connect first time entry box
     //switch sides should be an integer (1 or 2)
     //Clean up sequence 1
-    //Fire a "Complete" gui at the end of each sequence. 
+    //Fire a "Complete" gui at the end of each sequence.
     //--------------//
-
-
-
-
-
-
-
-
-
-
 
 
 });
