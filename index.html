@@ -25,9 +25,12 @@ $(document).ready(function(){
     //4 sequences total, with sequence #2 only playing the first day
     //-----------------------//
     //--To Do--//
+    //Sequence controller
     //timers to record data on all sequences.
     //export data to excel sheet
     //total-time-entry box on menu
+    //Connect first time entry box
+    //switch sides should be an integer (1 or 2)
 
     //////////
 
@@ -138,11 +141,15 @@ $(document).ready(function(){
                 };
 
         },
-        check_score: function(func){
+        check_score: function(){
                 console.log("Score is: "+ console1.score);
-
                 if (console1.score < 1) {
-                    func();
+                    console_helper.hide_everything();
+                    timer.wait(console_helper.show_everything);
+                    console1.score_one();
+                    console1.update_gui_score();
+                    setTimeout(general_helper.side_switcher, 1000);
+
                 } else {
                 };
         },
@@ -168,7 +175,7 @@ $(document).ready(function(){
     //Sequence #1
 
     var sequence1 = function() {
-        general_info.what_sequence = 1;
+        general_helper.what_sequence = 1;
         //var blackout_time = blackout;
         //hide both consoles
         $('#console1').fadeOut();
@@ -195,7 +202,7 @@ $(document).ready(function(){
                 });
             });
         }   else if (switch_sides == '2') {
-            $('#console2').show();
+            $('#console2').fadeIn();
             $('#console2').click(function() {
                 setTimeout(function(){ $('#console2').fadeOut(); }, 500);
                 setTimeout(function(){ $('#console1').fadeIn(); }, blackout_time * 1000);
@@ -211,26 +218,36 @@ $(document).ready(function(){
         };
     };
 
+
     //Sequence #2
     function sequence2(){
+        //Used to test which item kids would prefer at FR 1
+        console1.score_one(); //set the score == 1
+        console.log(switch_sides);
+        if (switch_sides == "2") {
+            console.log("Worked");
+            general_helper.side_switcher();
+        };
+
         $('#console1').click(function(){
             console1.touch(); //subtracks 1 from score
             console1.update_gui_score(); //updates the gui based off of current score
-            console_helper.checker(); //
+            console_helper.check_score();
 
         });
         $('#console2').click(function(){
             $('#score2').fadeOut();
-            setTimeout(console_helper.hide_everything, 700);
-            timer.wait(general_helper.reset_to_base);
+            setTimeout(console_helper.hide_everything, 500);
+            timer.wait(console_helper.show_everything);
+            setTimeout(general_helper.side_switcher, 1000);
 
         });
     };
-
-    general_helper.bundle_1_start();
+    //general_helper.bundle_1_start();
 
     // __SEQUENCE 3 DONE___ //
     var seq3_events = {
+        //general_helper.what_sequence: 3,
         number_of_trials: 2, //(1) low effort and another high effort
         number_of_trials_completed: 1,
         checker: function(){
@@ -247,11 +264,10 @@ $(document).ready(function(){
                     console_helper.hide_everything();
                     timer.wait(console_helper.console1_shower);
                     console1.score = 20; // ---------------- Hook entry box onto this
-                    console1.update_gui_score();
+                    setTimeout(console1.update_gui_score, 1000);
                     console.log('2');
             } else{
                 console.log("almost");
-
             };
         },
     };
@@ -263,18 +279,12 @@ $(document).ready(function(){
             console1.score_one();
             $("#score1").fadeIn();
         ////
-
             $('#console1').click(function(){
                 console1.touch();
                 console1.update_gui_score();
                 seq3_events.checker();
             });
     };
-
-    //sequence3();
-
-
-
 
     //Sequence #4
     var sequence4 = {
@@ -287,11 +297,8 @@ $(document).ready(function(){
             };
             console1.initialize();
             console1.update_gui_score();
-
         },
         seq: function() {
-
-
         $('#console1').click(function(){
             console1.touch(); //subtracks 1 from score
             console1.update_gui_score(); //updates the gui based off of current score
@@ -301,20 +308,67 @@ $(document).ready(function(){
                 $('#score2').fadeOut();
                 setTimeout(console_helper.hide_everything, 700);
                 timer.wait(general_helper.reset_to_base);
-
             });
         },
-
     };
 
-    sequence4.init()
+
+
+
+
+
+    //Show Gideon in this order
+    switch_sides = '2';
+    //S1 Works
+    //S2 broken
+    //S3 N?A
+    //S4 Works
+
+
+    //__Sequence_1__
+    //Needs to stop after 2 intervals
+    //Switch sides is broken
+    //Revise this section. You can do it way more effeciently..
+    //sequence1();
+
+    //__Sequence_2___
+    //Needs to stop after 1 interval
+    //Make sure timing methods are correct. Ipad seems to last a bit longer
+    //sequence2();
+
+    //__Sequence_3__
+    //Needs to stop after 2 intervals
+    //Should Ipad be in the middle
+    //Changle (High) fr requirement. Currently set to 20 in this sequence
+    //sequence3();
+
+    //__Sequence_4__
+    //Needs to stop after 4 intervals
+    sequence4.init();
     sequence4.seq();
+
+    //--To Do--//
+    //Sequence controller
+    //timers to record data on all sequences.
+    //export data to excel sheet
+    //total-time-entry box on menu
+    //Connect first time entry box
+    //switch sides should be an integer (1 or 2)
+    //Clean up sequence 1
+    //Fire a "Complete" gui at the end of each sequence. 
+    //--------------//
+
+
+
+
+
+
+
 
 
 
 
 
 });
-
 </script>
 </html>
