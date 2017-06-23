@@ -26,8 +26,83 @@ $(document).ready(function(){
     //4 sequences total, with sequence #2 only playing the first day
     //-----------------------//
 
+
+    var new_data = localStorage.getItem('Entry_Data');
+    new_data = JSON.parse(new_data);
+
+
+/* USE AS REFERENCE
+    var my_data = {
+        key1: fr_ratio,
+        key2: blackout_time,
+        key3: switch_sides,
+        key4: first_time
+    };
+*/
+
+
+
+
+
+
     //Sequence #1
 
+    function sequence1(my_switch,blackout) {
+
+        var blackout_time = blackout;
+
+        //hide both consoles
+        $('#console1').hide();
+        $('#console2').hide();
+
+        if (my_switch == '1') {
+            $('#console1').show();
+            $('#console1').click(function() {
+                setTimeout(function(){ $('#console1').hide(); }, 500);
+                setTimeout(function(){ $('#console2').show(); }, blackout_time * 1000);
+
+                $('#console2').click(function() {
+                    setTimeout(function(){ $('#console2').hide(); }, 500);
+                    setTimeout(function(){ $('#console1').show(); }, blackout_time * 1000);
+                    setTimeout(function(){ $('#console2').show(); }, blackout_time * 1000);
+                });
+            });
+        }   else if (my_switch == '2') {
+            $('#console2').show();
+            $('#console2').click(function() {
+                setTimeout(function(){ $('#console2').hide(); }, 500);
+                setTimeout(function(){ $('#console1').show(); }, blackout_time * 1000);
+
+                $('#console1').click(function() {
+                    setTimeout(function(){ $('#console1').hide(); }, 500);
+                    setTimeout(function(){ $('#console2').show(); }, blackout_time * 1000);
+                    setTimeout(function(){ $('#console1').show(); }, blackout_time * 1000);
+                });
+            });
+        } else {
+            console.log("Error in Sequence1");
+        };
+
+
+        //Timer
+        //use performance.now() instead of new Date(), more reliable.
+
+        //var start_timer = performance.now();
+        //window.setTimeout(alert("hello"), 3000);
+        //var end_timer = performance.now();
+
+        //console.log("Started:", start_timer.getTime());
+        //console.log("Ended:", end_timer.getTime());
+
+        //console.log((end_timer-start_timer)/1000);
+            // hide everything for the total time
+
+        //do the same thing for the other console.
+
+
+    };
+
+    sequence1(new_data['key3'], new_data['key2']);
 
 
     //Sequence #2
@@ -48,13 +123,12 @@ $(document).ready(function(){
 
 
     //Loads the last saved data object, parses it, and sets it.
-    var new_data = localStorage.getItem('Entry_Data');
-    new_data = JSON.parse(new_data);
+
 
     //sets the innitial amount for number of presses required
     //&bull; justs means big dot.
-    var str = Array(Number(new_data['key1']) + 1).join("&bull;"); //concatenates the large dots into Array
-    $('#score1').html(str); //writes in the new html
+    //var str = Array(Number(new_data['key1']) + 1).join("&bull;"); //concatenates the large dots into Array
+    //$('#score1').html(str); //writes in the new html
 
 
 
