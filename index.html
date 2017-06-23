@@ -24,6 +24,12 @@ $(document).ready(function(){
     //--Titrate Assessment--//
     //4 sequences total, with sequence #2 only playing the first day
     //-----------------------//
+    //--To Do--//
+    //timers to record data on all sequences.
+    //export data to excel sheet
+    //total-time-entry box on menu
+
+    //////////
 
     var new_data = localStorage.getItem('Entry_Data');
     new_data = JSON.parse(new_data);
@@ -36,6 +42,8 @@ $(document).ready(function(){
     var general_helper =
     {
         what_sequence: 0, //Keeps track of sequence information
+        Trial_number: 0,
+
 
         bundle_1_start: function(){
             console1.initialize();
@@ -105,24 +113,25 @@ $(document).ready(function(){
                 $('#score1').fadeIn();
         },
         hide_everything: function() {
-                    $('#console1').hide();
-                    $('#score1').hide();
-                    $('#console2').hide();
-                    $('#score1').hide();
+                    $('#console1').fadeOut();
+                    $('#score1').fadeOut();
+                    $('#console2').fadeOut();
+                    $('#score1').fadeOut();
                     },
         show_everything: function(){
-            $('#console1').show();
-            $('#score1').show();
-            $('#console2').show();
-            $('#score2').show();
+            $('#console1').fadeIn();
+            $('#score1').fadeIn();
+            $('#console2').fadeIn();
+            $('#score2').fadeIn();
         },
         checker: function(){
                 if (console1.score < 1) {
                     console_helper.hide_everything();
+                    timer.wait(general_helper.side_switcher);
+                    timer.wait(console1.initialize);
+                    timer.wait(console1.update_gui_score);
                     timer.wait(console_helper.show_everything);
-                    console1.initialize()
-                    console1.update_gui_score()
-                    general_helper.side_switcher();
+                    general_helper.Trial_number += 1;
 
                 } else {
                     console.log('Console1 is at: ' + console1.score);
@@ -162,15 +171,15 @@ $(document).ready(function(){
         general_info.what_sequence = 1;
         //var blackout_time = blackout;
         //hide both consoles
-        $('#console1').hide();
-        $('#console2').hide();
+        $('#console1').fadeOut();
+        $('#console2').fadeOut();
 
 
         if (switch_sides == '1') {
-            $('#console1').show();
+            $('#console1').fadeIn();
 
             $('#console1').click(function() {
-                $('#score1').hide();
+                $('#score1').fadeOut();
 
                 setTimeout(function(){ $('#console1').fadeOut(); }, 500);
                 setTimeout(function(){ $('#console2').fadeIn(); }, blackout_time * 1000);
@@ -262,12 +271,45 @@ $(document).ready(function(){
             });
     };
 
-    sequence3();
+    //sequence3();
 
 
 
 
     //Sequence #4
+    var sequence4 = {
+        x:4,
+        init: function() {
+            if (switch_sides == '2') {
+                general_helper.side_switcher();
+            } else {
+
+            };
+            console1.initialize();
+            console1.update_gui_score();
+
+        },
+        seq: function() {
+
+
+        $('#console1').click(function(){
+            console1.touch(); //subtracks 1 from score
+            console1.update_gui_score(); //updates the gui based off of current score
+            console_helper.checker(); //
+            });
+            $('#console2').click(function(){
+                $('#score2').fadeOut();
+                setTimeout(console_helper.hide_everything, 700);
+                timer.wait(general_helper.reset_to_base);
+
+            });
+        },
+
+    };
+
+    sequence4.init()
+    sequence4.seq();
+
 
 
 
