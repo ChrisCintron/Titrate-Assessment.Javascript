@@ -20,7 +20,44 @@
 </body>
 <script>
 $(document).ready(function(){
-    
+
+
+    //--Titrate Assessment--//
+    //4 sequences total, with sequence #2 only playing the first day
+    //-----------------------//
+
+    //Sequence #1
+
+
+
+    //Sequence #2
+
+
+
+
+
+    //Sequence #3
+
+
+
+
+
+    //Sequence #4
+
+
+
+
+    //Loads the last saved data object, parses it, and sets it.
+    var new_data = localStorage.getItem('Entry_Data');
+    new_data = JSON.parse(new_data);
+
+    //sets the innitial amount for number of presses required
+    //&bull; justs means big dot.
+    var str = Array(Number(new_data['key1']) + 1).join("&bull;"); //concatenates the large dots into Array
+    $('#score1').html(str); //writes in the new html
+
+
+
 
 });
 

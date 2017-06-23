@@ -5,26 +5,69 @@
      <meta charset="UTF-8">
      <title>Data Entry Fields</title>
     <link rel="stylesheet" href="menustyle.css" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
  </head>
 
  <body>
      <div class ="Menu-Container">
-         <p>Titrate Assessment</p>
-         <p>Please fill out the form below and press submit</p>
-        <form id="My_form">
+        <p>Titrate Assessment</p>
+        <p>Please fill out the form below and press submit</p>
+        <div id="My_form">
 
-          FR Ratio:<input type="number" name="fr_ratio">
-          <br>
-          Blackout:<input type="number" name="blackout">
-          <br>
-          Switch Sides:<input type="text" name="switch_sides">
-          <br>
+            FR Ratio:<input type="number" name="fr_ratio">
+            <br>
+            Blackout:<input type="number" name="blackout">
+            <br>
+            Switch Sides:<input type="text" name="switch_sides">
+            <br>
+            First Time?:<input type="text" name="first_time">
+            <br>
+            <button type="button" id="Submit_button">Submit</button>
+        </div>
+    </div>
+    <div id="main_app" contenteditable="true">
+    </div>
 
-          <input id="submit_button" type="submit" value="Submit">
-        </form>
+ <script>
+ $(document).ready(function(){
 
-     </div>
+     var fr_ratio = null;
+     var blackout_time = null;
+     var switch_sides = null;
+     var first_time = null;
 
+     //On button press, grab entry field values and store in variables
+     $("#Submit_button").click(function(){
+
+        //Grabs the data from menu
+        fr_ratio = $('[name=fr_ratio]').val();
+        blackout_time = $('[name=blackout]').val();
+        switch_sides = $('[name=switch_sides]').val();
+        first_time = $('[name=first_time]').val();
+
+        //data object we will pass after this page is done
+        var my_data = {
+            key1: fr_ratio,
+            key2: blackout_time,
+            key3: switch_sides,
+            key4: first_time
+        };
+
+        //hide all pages I don't need
+        $('html').hide();
+
+        //Stores data inside localstorage.
+        localStorage.setItem('Entry_Data', JSON.stringify(my_data));
+
+        //Display my main html page. Done
+        window.location.replace('index.html');
+
+     });
+ });
+
+ </script>
  </body>
 
  </html>
