@@ -10,12 +10,12 @@
 <body>
     <div id="console1">
         <img src="images/ipad_Gideon.gif" class="myipad" alt="ipad">
-        <div id="score1" class="score">&bull;</div>
+        <div id="score1" class="score" >&bull;</div>
 
     </div>
     <div id="console2">
         <img src="images/book_Gideon.gif" class="mybook" alt="book">
-        <div id="score2" class="score">&bull;</div>
+        <div id="score2" class="score" >&bull;</div>
     </div>
 </body>
 <script>
@@ -29,16 +29,131 @@ $(document).ready(function(){
 
     var new_data = localStorage.getItem('Entry_Data');
     new_data = JSON.parse(new_data);
+    var fr_ratio = new_data['key1'];
+    var blackout_time = new_data['key2'];
+    var switch_sides = new_data['key3'];
+    var first_time = new_data['key4'];
+    //var side = $('#console1').css("float");
 
 
-/* USE AS REFERENCE
-    var my_data = {
-        key1: fr_ratio,
-        key2: blackout_time,
-        key3: switch_sides,
-        key4: first_time
+    var general_helper =
+    {
+        what_sequence: 0, //Keeps track of sequence information
+
+        bundle_1_start: function(){
+            console1.initialize();
+            console1.update();
+            console_helper.show_everything();
+        },
+
+        bundle_2_middle: function() {
+            general_helper.bundle_1_start();
+            general_helper.side_switcher();
+        },
+
+
+        normal_side_puter: function() {
+            $('#console1').css("float", "left");
+            $('#console2').css("float", "right");
+        },
+
+        side_switcher: function() {
+            var side = $('#console1').css("float");
+            console.log('Side= ' + side);
+
+            if (side == 'left') {
+                $('#console1').css("float", "right");
+                $('#console2').css("float", "left");
+                console.log("I switched sides");
+
+
+            } else if (side == 'right') {
+                general_helper.normal_side_puter();
+            } else {
+                    console.log("Side switcher broke");
+            };
+        },
+        reset: function() {
+            console1.initialize();
+            console_helper.show_everything();
+
+
+        },
+
     };
-*/
+
+    var console1 = {
+        score: 0,
+        initialize: function(){ //resets console1's score
+                    console1.score = fr_ratio;
+
+        },
+        touch: function(){ //takes away a point from score
+            console1.score -= 1;
+
+        },
+        update: function(){ //Uses console1's score to update visuals
+                var str = Array(Number(console1.score)+ 1).join("&bull;"); //concatenates the large dots into Array
+                $('#score1').html(str); //writes in the new html
+
+
+        },
+
+        score_one: function(){
+                    var str = Array(2).join("&bull;"); //Gives score one dot
+                    $('#score1').html(str); //writes in the new html
+        },
+
+
+    };
+
+    var console_helper = {
+        hide_everything: function() {
+                    $('#console1').hide();
+                    $('#score1').hide();
+                    $('#console2').hide();
+                    $('#score1').hide();
+                    },
+        show_everything: function(){
+            $('#console1').show();
+            $('#score1').show();
+            $('#console2').show();
+            $('#score2').show();
+        },
+        checker: function(){
+                if (console1.score < 1) {
+                    console_helper.hide_everything();
+                    timer.wait(console_helper.show_everything);
+                    console1.initialize()
+                    console1.update()
+                    general_helper.side_switcher();
+
+
+                } else {
+                    console.log('Console1 is at: ' + console1.score);
+
+                };
+
+        },
+
+    };
+
+    var timer = {
+        //tracker: 0,
+        records: [], //tracks individual session records
+        start: function(){ performance.now();},
+        stop: function(){performance.now();},
+        log: function(){
+            timer.records[timer.tracker] = (timer.stop-timer.start)*1000;
+            timer.tracker += 1;
+                        },
+        wait: function(func){
+            setTimeout(func, blackout_time*1000);
+
+        },
+
+
+    };
 
 
 
@@ -47,65 +162,83 @@ $(document).ready(function(){
 
     //Sequence #1
 
-    function sequence1(my_switch,blackout) {
+    var sequence1 = function() {
 
-        var blackout_time = blackout;
+        general_info.what_sequence = 1;
+        //var blackout_time = blackout;
 
         //hide both consoles
         $('#console1').hide();
         $('#console2').hide();
 
-        if (my_switch == '1') {
+
+        if (switch_sides == '1') {
             $('#console1').show();
+
             $('#console1').click(function() {
-                setTimeout(function(){ $('#console1').hide(); }, 500);
-                setTimeout(function(){ $('#console2').show(); }, blackout_time * 1000);
+                $('#score1').hide();
+
+                setTimeout(function(){ $('#console1').fadeOut(); }, 500);
+                setTimeout(function(){ $('#console2').fadeIn(); }, blackout_time * 1000);
+                //$('#score1').show();
+
 
                 $('#console2').click(function() {
-                    setTimeout(function(){ $('#console2').hide(); }, 500);
-                    setTimeout(function(){ $('#console1').show(); }, blackout_time * 1000);
-                    setTimeout(function(){ $('#console2').show(); }, blackout_time * 1000);
+                    $('#score2').hide();
+                    setTimeout(function(){ $('#console2').fadeOut(); }, 500);
+                    setTimeout(function(){ $('#console1').fadeIn(); }, blackout_time * 1000);
+                    setTimeout(function(){ $('#console2').fadeIn(); }, blackout_time * 1000);
+                    $('#score1').show();
+                    $('#score2').show();
+
+
+
                 });
             });
-        }   else if (my_switch == '2') {
+        }   else if (switch_sides == '2') {
             $('#console2').show();
             $('#console2').click(function() {
-                setTimeout(function(){ $('#console2').hide(); }, 500);
-                setTimeout(function(){ $('#console1').show(); }, blackout_time * 1000);
+                setTimeout(function(){ $('#console2').fadeOut(); }, 500);
+                setTimeout(function(){ $('#console1').fadeIn(); }, blackout_time * 1000);
 
                 $('#console1').click(function() {
-                    setTimeout(function(){ $('#console1').hide(); }, 500);
-                    setTimeout(function(){ $('#console2').show(); }, blackout_time * 1000);
-                    setTimeout(function(){ $('#console1').show(); }, blackout_time * 1000);
+                    setTimeout(function(){ $('#console1').fadeOut(); }, 500);
+                    setTimeout(function(){ $('#console2').fadeIn(); }, blackout_time * 1000);
+                    setTimeout(function(){ $('#console1').fadeIn(); }, blackout_time * 1000);
                 });
             });
         } else {
             console.log("Error in Sequence1");
         };
-
-
-        //Timer
-        //use performance.now() instead of new Date(), more reliable.
-
-        //var start_timer = performance.now();
-        //window.setTimeout(alert("hello"), 3000);
-        //var end_timer = performance.now();
-
-        //console.log("Started:", start_timer.getTime());
-        //console.log("Ended:", end_timer.getTime());
-
-        //console.log((end_timer-start_timer)/1000);
-            // hide everything for the total time
-
-        //do the same thing for the other console.
-
-
     };
-
-    sequence1(new_data['key3'], new_data['key2']);
 
 
     //Sequence #2
+
+
+    function sequence2(){
+        $('#console1').click(function(){
+            console1.touch(); //subtracks 1 from score
+            console1.update(); //updates the gui based off of current score
+            console_helper.checker(); //
+
+        });
+        $('#console2').click(function(){
+            $('#score2').fadeOut();
+            setTimeout(console_helper.hide_everything, 700);
+            timer.wait(general_helper.bundle_2_middle);
+
+        });
+
+    };
+
+
+
+    general_helper.bundle_1_start();
+    sequence2();
+
+    //general_helper.side_switcher();
+
 
 
 
@@ -118,17 +251,6 @@ $(document).ready(function(){
 
 
     //Sequence #4
-
-
-
-
-    //Loads the last saved data object, parses it, and sets it.
-
-
-    //sets the innitial amount for number of presses required
-    //&bull; justs means big dot.
-    //var str = Array(Number(new_data['key1']) + 1).join("&bull;"); //concatenates the large dots into Array
-    //$('#score1').html(str); //writes in the new html
 
 
 
