@@ -21,21 +21,149 @@
 <script>
 $(document).ready(function(){
 
-    //--Titrate Assessment--//
-    //4 sequences total, with sequence #3 only playing the first day
-    //-----------------------//
+//---------------Titrate Assessment-----------//
+//-----------------Main--------------------//
 
-    //--To Do--//
-    //Moved to bottom
-    //////////
+    var app = {
+            //Holds sequence objects
+            myevents: [],
 
-    var new_data = localStorage.getItem('Entry_Data');
-    new_data = JSON.parse(new_data);
-    var fr_ratio = new_data['key1'];
-    var blackout_time = new_data['key2'];
-    var switch_sides = new_data['key3'];
-    var first_time = new_data['key4'];
-    //var side = $('#console1').css("float");
+            //add sequences to myevent list
+            //EX: add_events(sequence1, sequence2, sequence3)
+            add_events: function(...events) {
+                for (let sequence of events) {
+                    app.myevents.push(sequence);
+                }
+            },
+
+            //Loops through sequence list, on each, executes run()
+            run: function() {
+                var i;
+                    for (i=0; i<app.myevents.length; ++i) {
+                            app.myevents[i].run();
+                    }
+            },
+    };
+
+//------------Main End-------------------//
+
+//------------- App Data -------------//
+    var mydata = {
+
+        //------initial data---------------------//
+        //Complete
+        fr_value: null,
+        blackout_time: null,
+        switch_sides: null,
+        first_time: null,
+        //InProgress
+
+        /*
+        child_id: null,
+        session: null, //What day are they on.
+        Trial: null, //FC, BOTH, first_time, [1,2,3,4]
+        position_ipad: null,
+        responses_ipad: null,
+        time_stamp: null, //stamp each action, append to a list [#,#,#,#]
+        time_trial: null, //how long was each trial/sequence
+        time_session: null //how long did the session last
+        */
+        //--------------------------------------//
+
+
+        initialize: function(){
+                var data = JSON.parse(localStorage.getItem('Entry_Data'));
+                mydata.fr_value = data['key1'];
+                mydata.blackout_time = data['key2'];
+                mydata.switch_sides = data['key3'];
+                mydata.first_time = data['key4'];
+                },
+
+        responses: {
+            //response data manipulation methods
+        },
+    };
+
+//------------- App Data End -------------//
+
+
+// ---------My Sequences-------------//
+//Add a sequence  here and
+// then add the sequence to app.add_events(*add new sequence*)
+
+    var sequence1 = {
+        run: function() {
+                console.log("Sequence1: I worked");
+        },
+    };
+
+    var sequence2 = {
+
+
+        run: function() {
+                console.log("Sequence2: I worked");
+        },
+    };
+
+    var sequence3 = {
+        run: function() {
+                console.log("Sequence3: I worked");
+        },
+    };
+
+    var sequence4 = {
+        run: function() {
+                console.log("Sequence4: I worked");
+        },
+    };
+
+    //Turn this on later
+    //app.add_events(sequence1, sequence2, sequence3, sequence4);
+
+
+//-----------------End----------------//
+
+//--------------Controller-------------//
+        //Controls gui events//
+
+var controller = {
+
+    //Timer//
+    t1:0, //Start time
+    t2:0, //End time
+
+
+    reset: function(){ //not sure
+
+    },
+
+    clearscreen: function(){ //Blanks out the screen
+
+
+    },
+
+    update_gui_score: function(){ //Syncs gui score with score data
+
+
+    },
+
+    time_start: function(){ //sets t1 to start time
+
+    },
+
+    time_end: function(){ //sets t2 to end time
+
+    },
+
+    write_to_file: function(){ //Saves data into file
+
+    },
+    spacebar_next: function(){ //Nexts the current interval.
+
+    },
+};
+
+/*
 
     var general_helper =
     {
@@ -342,8 +470,7 @@ $(document).ready(function(){
     //Clean up sequence 1
     //Fire a "Complete" gui at the end of each sequence.
     //--------------//
-
-
+    */
 });
 </script>
 </html>
