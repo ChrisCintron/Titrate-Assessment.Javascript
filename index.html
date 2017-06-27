@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="stylesheet.css" type="text/css">
 </head>
 <body>
+
     <div id="console1">
         <img src="images/ipad_Gideon.gif" class="myipad" alt="ipad">
         <div id="score1" class="score" >&bull;</div>
@@ -17,9 +18,56 @@
         <img src="images/book_Gideon.gif" class="mybook" alt="book">
         <div id="score2" class="score" >&bull;</div>
     </div>
+
+<!-- TABLE FOR EASY VIEW AND EXPORT.
+Inprogress
+
+    <table id="datatable">
+        <thead>
+            <tr>
+                <th>Child_ID</th>
+                <th>SESSION</th>
+                <th>TRIAL</th>
+                <th>FR_VALUE</th>
+                <th>POSITION_IPAD</th>
+                <th>RESPONSES_IPAD</th>
+                <th>TIME_STAMP</th>
+                <th>TIME_TRIAL</th>
+                <th>TIME_SESSION</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+            </tr>
+        </tbody>
+    </table>
+-->
 </body>
 <script>
 $(document).ready(function(){
+
+
+
 
 //---------------Titrate Assessment-----------//
 //-----------------Main--------------------//
@@ -27,7 +75,6 @@ $(document).ready(function(){
     var app = {
             //Holds sequence objects
             myevents: [],
-
             //add sequences to myevent list
             //EX: add_events(sequence1, sequence2, sequence3)
             add_events: function(...events) {
@@ -35,9 +82,11 @@ $(document).ready(function(){
                     app.myevents.push(sequence);
                 }
             },
-
             //Loops through sequence list, on each, executes run()
             run: function() {
+                if (app.myevents.length==0){
+                    console.log("No sequences to run");
+                };
                 var i;
                     for (i=0; i<app.myevents.length; ++i) {
                             app.myevents[i].run();
@@ -47,28 +96,39 @@ $(document).ready(function(){
 
 //------------Main End-------------------//
 
+
+
+
+
 //------------- App Data -------------//
     var mydata = {
-
-        //------initial data---------------------//
+        //------initial data--//
         //Complete
         fr_value: null,
         blackout_time: null,
-        switch_sides: null,
+        switch_sides: null, //normal or reverse
         first_time: null,
         //InProgress
 
-        /*
-        child_id: null,
-        session: null, //What day are they on.
-        Trial: null, //FC, BOTH, first_time, [1,2,3,4]
-        position_ipad: null,
-        responses_ipad: null,
-        time_stamp: null, //stamp each action, append to a list [#,#,#,#]
-        time_trial: null, //how long was each trial/sequence
-        time_session: null //how long did the session last
-        */
-        //--------------------------------------//
+        //Timers//
+        t1:0, //Start time
+        t2:0, //End time
+        score:0,
+
+        history: [], //Container for responses
+
+        response: {
+            child_id: null, //Only once
+            session: null, //What day are they on. //Only once
+            trial: null, //FC, BOTH, first_time, [1,2,3,4]
+            fr_value: null,
+            position_ipad: null,
+            responses_ipad: null,
+            time_stamp: null, //stamp each action, append to a list [#,#,#,#]
+            time_trial: null, //how long was each trial/sequence
+            time_session: null, //how long did the session last
+        },
+
 
 
         initialize: function(){
@@ -79,89 +139,183 @@ $(document).ready(function(){
                 mydata.first_time = data['key4'];
                 },
 
-        responses: {
-            //response data manipulation methods
-        },
+        //takes in response dictionary and puts in history list
+        store_response_history: function(data) {
+            mydata.history.push(data);
+            },
+
+
+
+
     };
 
 //------------- App Data End -------------//
 
 
+
+
 // ---------My Sequences-------------//
 //Add a sequence  here and
 // then add the sequence to app.add_events(*add new sequence*)
-
+//Remember: Eerything starts off hidden
     var sequence1 = {
         run: function() {
-                console.log("Sequence1: I worked");
-        },
-    };
+                console.log("Sequence1: Starting");
+
+
+
+
+                console.log("Sequence1: Completed");
+                },
+        };
+
+
+
+
+
+                //trial_ipad: function(){
+
+                //};
+
+                /*
+                    //---------ipad alone ----------//
+                    $('#console1').show();
+                    $('#console1').click(function() {
+                        controller.score_take();
+                        controller.update_console1_score();
+                        if (controller.score_checker() == false) {
+                            $('#console1').fadeOut(1000);
+                        };
+                    });
+                },
+                    */
+
+                //trial_book: function(){
+                //},
+
+
+                    /*
+                    //-----------book alone---------//
+                    $('#console2').show();
+                    $('#console2').click(function() {
+
+                        controller.score_take();
+                        controller.update_console1_score();
+                        if (controller.score_checker() == false) {
+                            $('#console1').fadeOut(1000);
+                        };
+                    });
+                },
+                */
+
+
 
     var sequence2 = {
-
-
         run: function() {
-                console.log("Sequence2: I worked");
-        },
-    };
+                console.log("Sequence2: Starting");
+
+                console.log("Sequence2: Completed");
+                },
+        };
 
     var sequence3 = {
         run: function() {
-                console.log("Sequence3: I worked");
-        },
-    };
+                console.log("Sequence3: Starting");
+
+                console.log("Sequence3: Completed");
+
+                },
+        };
 
     var sequence4 = {
         run: function() {
-                console.log("Sequence4: I worked");
-        },
-    };
+                console.log("Sequence4: Starting");
 
-    //Turn this on later
-    //app.add_events(sequence1, sequence2, sequence3, sequence4);
-
-
+                console.log("Sequence4: Completed");
+                },
+        };
 //-----------------End----------------//
+
+
+
+
+
 
 //--------------Controller-------------//
         //Controls gui events//
 
 var controller = {
 
-    //Timer//
-    t1:0, //Start time
-    t2:0, //End time
-
-
-    reset: function(){ //not sure
+    clearscreen: function(){ //Blanks out the screen by jquery hide
+        $('#console1').hide()
+        $('#console2').hide()
 
     },
 
-    clearscreen: function(){ //Blanks out the screen
-
-
-    },
-
-    update_gui_score: function(){ //Syncs gui score with score data
-
+    update_console1_score: function(){ //Syncs gui score with score data
+        var str = Array(Number(mydata.score)+ 1).join("&bull;"); //concatenates the large dots into Array
+        $('#score1').html(str); //writes in the new html
 
     },
 
-    time_start: function(){ //sets t1 to start time
-
+    timer_start: function(){ //sets t1 to start time
+        mydata.t1 = performance.now();
     },
 
-    time_end: function(){ //sets t2 to end time
-
+    timer_end: function(){ //sets t2 to end time
+        mydata.t2 = performance.now();
     },
 
-    write_to_file: function(){ //Saves data into file
-
+    time_reset: function(){
+    mydata.t1 = 0;
+    mydata.t2 = 0;
     },
+
     spacebar_next: function(){ //Nexts the current interval.
 
     },
+
+    score_take: function(){ //take away 1 from score
+        mydata.score -= 1;
+    },
+
+    score_checker: function(){ //Boolean
+        if (mydata.score > 0) {
+            return true;
+        } else {
+            return false;
+        };
+    },
+
+    switch_sides: function() {
+            if (mydata.response.position_ipad == 'left') {
+                $('#console1').css("float", "right");
+                $('#console2').css("float", "left");
+            } else {
+                $('#console1').css("float", "left");
+                $('#console2').css("float", "right");
+            }
+    },
 };
+
+
+//---------STARTUP COMMAND BOX-------//
+controller.clearscreen();
+mydata.score = 5;
+controller.update_console1_score();
+app.add_events(sequence1)
+app.run();
+
+//------------------------------------//
+
+
+
+
+
+
+
+
+
 
 /*
 
