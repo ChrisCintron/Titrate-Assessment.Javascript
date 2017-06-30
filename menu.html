@@ -24,6 +24,9 @@
             <br>
             First Time?:<input type="text" name="first_time">
             <br>
+            First time max amount?:<input type="number" name="maxamount">
+            <br>
+            
             <button type="button" id="Submit_button">Submit</button>
         </div>
     </div>
@@ -37,6 +40,7 @@
      var blackout_time = null;
      var switch_sides = null;
      var first_time = null;
+     var first_time_max_amount = null;
 
      //On button press, grab entry field values and store in variables
      $("#Submit_button").click(function(){
@@ -46,13 +50,16 @@
         blackout_time = $('[name=blackout]').val();
         switch_sides = $('[name=switch_sides]').val();
         first_time = $('[name=first_time]').val();
+        first_time_max_amount = $('[name=maxamount]').val();
+        first_val = $('[name=maxamo]').val();
 
         //data object we will pass after this page is done
         var my_data = {
             key1: fr_ratio,
             key2: blackout_time,
             key3: switch_sides,
-            key4: first_time
+            key4: first_time,
+            key5: first_time_max_amount,
         };
 
         //hide all pages I don't need

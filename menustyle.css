@@ -2,21 +2,36 @@
 p {
     width: inherit;
 }
+p:first-of-type{
+    border: 5px solid black;
+    width: 64%;
+    margin-left: 18%;
+}
 
 body {
     text-align: center;
+    background-image: url(https://image.freepik.com/free-vector/science-background-design_1212-531.jpg);
+    background-size: contain;
 }
 
 
-.Menu-Container {
-    height: 200px;
-    width: 320px;
+.Menu-Container {/*background-image:url(images/BF_Skinner.jpg);
+background-position:center;*/
+    height: 280px;
+    width: 350px;
     margin: 0 auto;
-    padding-top: 150px;
-    /*background-image:url(images/BF_Skinner.jpg);
-    background-position:center;*/
+    padding-top: 14px;
+    margin-top: 10%;
+    background-color: white;
+    border: 3px solid black;
 }
 
 #My_form {
     text-align: right;
+}
+
+#Submit_button {
+    width: inherit;
+    margin-right: 40%;
+    margin-top: 10%;
 }

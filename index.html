@@ -121,6 +121,7 @@ $(document).ready(function(){
         blackout_time: 3,
         switch_sides: 1,
         first_time: 'No',
+        first_time_max_amount: 2,
         //InProgress
 
         //Timers//
@@ -158,12 +159,28 @@ $(document).ready(function(){
                 mydata.blackout_time = data['key2'];
                 mydata.switch_sides = data['key3'];
                 mydata.first_time = data['key4'];
+                mydata.first_time_max_amount = data['key5'];
+                console.log("Initialized menu");
                 },
 
         //takes in response dictionary and puts in history list
         store_response_history: function(data) {
             mydata.history.push(data);
             },
+
+        getData: function(){
+            var response = {
+                fr_value: mydata.fr_value,
+                blackout_time: mydata.blackout_time,
+                switch_sides: mydata.switch_sides,
+                first_time: mydata.first_time,
+                first_time_max_amount: mydata.first_time_max_amount,
+            };
+
+            return response;
+
+
+        },
 
 
 
@@ -196,10 +213,7 @@ $(document).ready(function(){
 
         ipad_alone: function(){
             $('#console1').show()
-
-            console.log('Me');
             $('#console1').click(function(){
-
                 controller.score_take('#console1')
                 controller.update_scores();
                 if (controller.check_scores() == false){
@@ -213,7 +227,6 @@ $(document).ready(function(){
 
 
         book_alone: function(){
-            //console.log("Book");
             $('#console2').show()
             $('#console2').click(function(){
 
@@ -230,7 +243,6 @@ $(document).ready(function(){
         },
 
         order: function(){
-            console.log(mydata.switch_sides);
             if (mydata.switch_sides == 1) {
                 if (sequence1.data.current_trial == 1){
                     sequence1.ipad_alone();
@@ -255,7 +267,6 @@ $(document).ready(function(){
 
         run: function(){
             sequence1.reset_settings();
-            controller.scoreboard();
             sequence1.order();
         },
 
@@ -286,8 +297,8 @@ $(document).ready(function(){
                 if (mydata.switch_sides == 2) {
                     controller.switch_sides();
                 }
-                console.log("console1 number:" + mydata.con1key);
-                console.log("console2 number:" + mydata.con2key);
+                //console.log("console1 number:" + mydata.con1key);
+                //console.log("console2 number:" + mydata.con2key);
 
 
                 $('#console1').show()
@@ -367,7 +378,6 @@ $(document).ready(function(){
         },
 
         ipad_alone: function(callback, func){
-            //console.log("S3 score: " + mydata.score1);
             $('#console1').show()
             $('#console1').click(function(){
                 controller.score_take('#console1')
@@ -375,7 +385,7 @@ $(document).ready(function(){
                 if (controller.check_scores() == false){
                     console.log("hello");
                     controller.clearscreen();
-                    sequence3.reset_settings(6);
+                    sequence3.reset_settings(mydata.first_time_max_amount);
                     //callback(func);
                     controller.transition_screen_black();
                     setTimeout(function(){callback(func)}  , mydata.blackout_time*1000);
@@ -506,8 +516,7 @@ var controller = {
 
 
     check_scores: function(){ //Boolean
-        //console.log("Ipad: {"+ mydata.score1+ "}");
-        //console.log("Book: {"+ mydata.score2+ "}");
+
         if (mydata.score1 > 0 && mydata.score2 > 0) {
             return true;
         } else {
@@ -516,29 +525,16 @@ var controller = {
     },
 
     switch_sides: function() {
-            //console.log("ipad side:" + mydata.response.position_ipad);
             if (mydata.response.position_ipad == 'left') {
                 mydata.response.position_ipad = 'right';
                 $('#console1').css("float", "right");
                 $('#console2').css("float", "left");
-                //mydata.con1key = 39;
-                //mydata.con2key = 37;
 
-
-                //key codes
-
-                //mydata.con1key = 39;
-                //mydata.con2key = 37;
             } else {
-                //console.log("SS: 2");
                 mydata.response.position_ipad = 'left'; //doesnt update on its own :(
                 $('#console1').css("float", "left");
                 $('#console2').css("float", "right");
-                //mydata.con1key = 37;
-                //mydata.con2key = 39;
 
-                //mydata.con1key = 37;
-                //mydata.con2key = 39;
             }
     },
     scoreboard: function(){
@@ -573,6 +569,8 @@ controller.clearscreen();
 mydata.score1 = 1;
 mydata.score2 = 1;
 controller.update_scores();
+mydata.initialize();
+console.log(mydata.getData());
 app.add_events(sequence1)
 app.run();
 
