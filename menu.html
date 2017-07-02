@@ -16,6 +16,8 @@
         <p>Please fill out the form below and press submit</p>
         <div id="My_form">
 
+            Child ID:<input type="text" name="child_id">
+            <br>
             FR Ratio:<input type="number" name="fr_ratio">
             <br>
             Blackout:<input type="number" name="blackout">
@@ -26,7 +28,7 @@
             <br>
             First time max amount?:<input type="number" name="maxamount">
             <br>
-            
+
             <button type="button" id="Submit_button">Submit</button>
         </div>
     </div>
@@ -36,6 +38,7 @@
  <script>
  $(document).ready(function(){
 
+     var child_id = null;
      var fr_ratio = null;
      var blackout_time = null;
      var switch_sides = null;
@@ -46,15 +49,17 @@
      $("#Submit_button").click(function(){
 
         //Grabs the data from menu
+        child_id = $('[name=child_id]').val();
         fr_ratio = $('[name=fr_ratio]').val();
         blackout_time = $('[name=blackout]').val();
         switch_sides = $('[name=switch_sides]').val();
         first_time = $('[name=first_time]').val();
         first_time_max_amount = $('[name=maxamount]').val();
-        first_val = $('[name=maxamo]').val();
+        //first_val = $('[name=maxamo]').val();
 
         //data object we will pass after this page is done
         var my_data = {
+            key0: child_id,
             key1: fr_ratio,
             key2: blackout_time,
             key3: switch_sides,

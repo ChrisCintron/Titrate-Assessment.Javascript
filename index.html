@@ -5,6 +5,8 @@
 <head>
     <title>Titrate Assessment</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.10.6/xlsx.min.js"></script>
+    <script src="http://cdn.jsdelivr.net/alasql/0.3/alasql.min.js"></script>
     <link rel="stylesheet" href="stylesheet.css" type="text/css">
 </head>
 <body>
@@ -19,67 +21,33 @@
         <div id="score2" class="score" >&bull;</div>
     </div>
 
-<!-- TABLE FOR EASY VIEW AND EXPORT.
-Inprogress
 
-    <table id="datatable">
-        <thead>
-            <tr>
-                <th>Child_ID</th>
-                <th>SESSION</th>
-                <th>TRIAL</th>
-                <th>FR_VALUE</th>
-                <th>POSITION_IPAD</th>
-                <th>RESPONSES_IPAD</th>
-                <th>TIME_STAMP</th>
-                <th>TIME_TRIAL</th>
-                <th>TIME_SESSION</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-            </tr>
-        </tbody>
-    </table>
--->
 </body>
 <script>
 $(document).ready(function(){
+    var session_start = performance.now();
     $(document).keyup(function(e){
+        var tm = performance.now(); //needed to have the first one;
         console.log(e.keyCode);
         mydata.keypress = e.keyCode;
+
         var con1side = $('#console1').css('float')
         var con2side = $('#console2').css('float')
 
 
-        if (con1side == 'left' && e.keyCode == 37) {
+        if (con1side == 'left' && e.keyCode == 37 && $('#console1').is(":visible")) {
             $('#console1').click();
-        } else if (con2side == 'left' && e.keyCode == 37) {
+            controller.time_stamp();
+        } else if (con2side == 'left' && e.keyCode == 37 && $('#console2').is(":visible")) {
             $('#console2').click();
-        } else if (con1side == 'right' && e.keyCode == 39) {
+            controller.time_stamp();
+        } else if (con1side == 'right' && e.keyCode == 39 && $('#console1').is(":visible")) {
             $('#console1').click();
-        } else if (con2side == 'right' && e.keyCode == 39){
+            controller.time_stamp();
+        } else if (con2side == 'right' && e.keyCode == 39 && $("#console2").is(":visible")){
             $('#console2').click();
+            controller.time_stamp();
+
         }
 
     });
@@ -117,14 +85,29 @@ $(document).ready(function(){
     var mydata = {
         //------initial data--//
         //Complete
-        fr_value: 5,
         blackout_time: 3,
-        switch_sides: 1,
-        first_time: 'No',
-        first_time_max_amount: 2,
+        switch_sides: 1, //1 for ipad on left for each trial, 2 for book on left
+        first_time: null,
+        first_time_max_amount: null,
+
+
+        child_id: null, //initial
+        session: 1, //What day are they on. //Only once
+        trial: 0, //FC, BOTH, first_time, [1,2,3,4]
+        fr_value: null,
+        position_ipad: $('#console1').css('float'),
+        responses_ipad: null,
+        time_stamp: [], //stamp each action, append to a list [#,#,#,#]
+        time_trial: null, //how long was each trial/sequence
+        time_session: null, //how long did the session last
+
         //InProgress
 
         //Timers//
+        //Session
+        sessionstarttime: 0,
+        sessionendtime: 0,
+        //Trials
         t1:0, //Start time
         t2:0, //End time
 
@@ -137,24 +120,140 @@ $(document).ready(function(){
         keypress: 0,
         test:10000,
 
-        history: [], //Container for responses
-
         response: {
             child_id: null, //Only once
             session: null, //What day are they on. //Only once
             trial: null, //FC, BOTH, first_time, [1,2,3,4]
             fr_value: null,
-            position_ipad: $('#console1').css('float'),
+            position_ipad: null,
             responses_ipad: null,
-            time_stamp: null, //stamp each action, append to a list [#,#,#,#]
+            time_stamp: [], //stamp each action, append to a list [#,#,#,#]
             time_trial: null, //how long was each trial/sequence
             time_session: null, //how long did the session last
+        },
+
+        final_data: [],
+
+
+        update_position: function(new_ipad_pos){
+            mydata.response.position_ipad = new_ipad_pos;
+        },
+
+
+
+
+        reset_response_data: function(){
+            mydata.responses_ipad = 0;
+            controller.clear_time_stamp();
+            //mydata.response.child_id = null;
+            //mydata.response.session = null;
+            //mydata.response.trial = null;
+            //mydata.response.fr_value = null;
+            mydata.response.position_ipad = null;
+            mydata.response.responses_ipad = null;
+            mydata.response.time_stamp = [];
+            mydata.response.time_trial = null;
+            mydata.response.time_session = null;
+        },
+
+
+        //takes in response data
+        update_response_data: function(){
+            mydata.trial += 1;
+
+
+            //mydata.responses_ipad = mydata.fr_value - mydata.score1;
+
+            //console.log("Update_response_data: " + mydata.final_data);
+            mydata.response.child_id = mydata.child_id;
+            mydata.response.session =  mydata.session;
+            mydata.response.trial = mydata.trial;
+            mydata.response.fr_value = mydata.fr_value;
+            mydata.response.position_ipad = $('#console1').css('float');
+            mydata.response.responses_ipad = mydata.responses_ipad;
+            //mydata.response.time_stamp = mydata.time_stamp;
+            //mydata.response.time_trial = mydata.time_trial;
+            mydata.response.time_session = (performance.now() - session_start)/1000;
+
+            if (mydata.trial == 1){
+                mydata.response.time_trial = mydata.response.time_session;
+                mydata.t1 = mydata.response.time_session;
+                console.log('Trial:' + mydata.trial);
+                console.log("My session: " + mydata.response.time_session);
+                console.log('Mydatat1: ' + mydata.t1);
+                mydata.response.time_stamp.push(mydata.response.time_trial); 
+            } else {
+                mydata.response.time_trial = (mydata.response.time_session - mydata.t1);
+                mydata.t1 = mydata.response.time_session;
+
+                console.log('Trial:' + mydata.trial);
+                console.log("My session: " + mydata.response.time_session);
+                console.log('Mydatat1: ' + mydata.t1);
+                console.log('myTrial:' + mydata.response.time_trial);
+                mydata.t1 = mydata.response.time_trial;
+
+            }
+
+
+            //console.log("Update_response_data: " + mydata.final_data);
+
+        },
+
+
+
+        create_data: function(){
+            var obj;
+            var data = [];
+
+            //Turns time_stamp array into csv format
+
+            mydata.response.time_stamp = mydata.response.time_stamp.join(" : ");
+
+            //Results in object variables
+            var realobj = Object.values(mydata.response);
+            for(i=0; i < realobj.length; i++)
+            {
+                data.push(String(realobj[i]));
+            };
+            console.log(data);
+            return data;
+
+        },
+        push_data_to_final: function(data){
+            //Data should be an array
+            mydata.final_data.push(data);
+        },
+
+        download_csv: function() {
+
+            /* Example Data
+            var data = [
+               ['12542', '1'],
+               ['Bar', f],
+               ['Moo', 'Reindeer Hunter']
+            ];
+            */
+
+            data = mydata.final_data;
+            var csv = 'CHILD_ID,SESSION,TRIAL,FR_VALUE,POSITION_IPAD,RESPONSES_IPAD,TIME_STAMP,TIME_TRIAL,TIME_SESSION\n';
+            data.forEach(function(row) {
+                    csv += row.join(',');
+                    csv += "\n";
+            });
+
+            console.log(csv);
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+            hiddenElement.target = '_blank';
+            hiddenElement.download = 'demand_assessment.csv';
+            hiddenElement.click();
         },
 
 
 
         initialize: function(){
                 var data = JSON.parse(localStorage.getItem('Entry_Data'));
+                mydata.child_id = data['key0'];
                 mydata.fr_value = data['key1'];
                 mydata.blackout_time = data['key2'];
                 mydata.switch_sides = data['key3'];
@@ -164,9 +263,6 @@ $(document).ready(function(){
                 },
 
         //takes in response dictionary and puts in history list
-        store_response_history: function(data) {
-            mydata.history.push(data);
-            },
 
         getData: function(){
             var response = {
@@ -175,10 +271,10 @@ $(document).ready(function(){
                 switch_sides: mydata.switch_sides,
                 first_time: mydata.first_time,
                 first_time_max_amount: mydata.first_time_max_amount,
+
             };
 
             return response;
-
 
         },
 
@@ -216,7 +312,15 @@ $(document).ready(function(){
             $('#console1').click(function(){
                 controller.score_take('#console1')
                 controller.update_scores();
+                mydata.responses_ipad += 1;
                 if (controller.check_scores() == false){
+
+
+                    //controller.clear_time_stamp();
+                    mydata.update_response_data();
+                    mydata.push_data_to_final(mydata.create_data());
+                    mydata.reset_response_data();
+
                     sequence1.data.current_trial += 1;
                     sequence1.quit();
                     controller.transition_screen_black();
@@ -233,6 +337,13 @@ $(document).ready(function(){
                 controller.score_take('#console2')
                 controller.update_scores();
                 if (controller.check_scores() == false){
+
+                    //controller.clear_time_stamp();
+
+                    mydata.update_response_data();
+                    mydata.push_data_to_final(mydata.create_data());
+                    mydata.reset_response_data();
+
                     sequence1.data.current_trial += 1;
                     sequence1.quit();
                     controller.transition_screen_black();
@@ -255,10 +366,12 @@ $(document).ready(function(){
 
             }   else if (mydata.switch_sides == 2) {
                     if (sequence1.data.current_trial == 1){
+                        controller.switch_sides();
                         sequence1.book_alone();
                     } else if (sequence1.data.current_trial == 2) {
                         sequence1.ipad_alone();
                     } else {
+                        controller.normalizer();
                         sequence2.run();
                     };
                 }
@@ -293,12 +406,11 @@ $(document).ready(function(){
         },
         run: function() {
                 sequence2.reset_settings()
-
+                controller.normalizer();
                 if (mydata.switch_sides == 2) {
                     controller.switch_sides();
                 }
-                //console.log("console1 number:" + mydata.con1key);
-                //console.log("console2 number:" + mydata.con2key);
+
 
 
                 $('#console1').show()
@@ -306,7 +418,16 @@ $(document).ready(function(){
                     //if (mydata.keypress == mydata.con1key) {
                         controller.score_take('#console1')
                         controller.update_scores();
+                        mydata.responses_ipad += 1;
+
                         if (controller.check_scores() == false){
+
+                            //controller.clear_time_stamp();
+
+                            mydata.update_response_data();
+                            mydata.push_data_to_final(mydata.create_data());
+                            mydata.reset_response_data();
+
                             controller.clearscreen();
                             sequence2.reset_settings();
                             //sequence2.nextseq();
@@ -325,19 +446,26 @@ $(document).ready(function(){
                         controller.score_take('#console2')
                         controller.update_scores();
                         if (controller.check_scores() == false){
+
+                            //controller.clear_time_stamp();
+
+                            mydata.update_response_data();
+                            mydata.push_data_to_final(mydata.create_data());
+                            mydata.reset_response_data();
+
                             controller.clearscreen();
                             sequence2.reset_settings();
                             controller.transition_screen_black();
                             setTimeout(sequence2.nextseq , mydata.blackout_time*1000);
-
-
                         }
                 });
                 },
         nextseq: function(){
+            controller.normalizer();
             if (mydata.first_time == "Yes"){
                 sequence3.run();
             } else {
+
                 sequence4.run();
             }
         }
@@ -354,7 +482,7 @@ $(document).ready(function(){
                 controller.clearscreen()
                 controller.unbind_all()
                 mydata.score1 = num;
-                mydata.switch_sides = 1;
+                //mydata.switch_sides;
                 controller.update_scores();
         },
 
@@ -382,6 +510,7 @@ $(document).ready(function(){
             $('#console1').click(function(){
                 controller.score_take('#console1')
                 controller.update_scores();
+
                 if (controller.check_scores() == false){
                     console.log("hello");
                     controller.clearscreen();
@@ -419,22 +548,40 @@ $(document).ready(function(){
         run: function() {
 
                 if (sequence4.data.current_trial > 4) {
+                    console.log("downloading data");
+                    mydata.download_csv();
                     return;
                 };
 
+                if (sequence4.data.current_trial == 1) {
+                    console.log("Normalzied Ipad to left side");
+                    controller.normalizer();
+
+                };
+                console.log("switch_sides: " + mydata.switch_sides);
                 if (mydata.switch_sides == 2 || sequence4.data.current_trial > 1) {
-                    //console.log("SWitching sides!");
+                    console.log("SWitching sides!");
                     controller.switch_sides();
-                }
+                };
 
                 sequence4.reset_settings(4)
                 $('#console1').show()
                 $('#console1').click(function(){
                     controller.score_take('#console1')
                     controller.update_scores();
+                    mydata.responses_ipad += 1;
+
                     if (controller.check_scores() == false){
+
+                        //controller.clear_time_stamp();
+
+                        mydata.update_response_data();
+                        mydata.push_data_to_final(mydata.create_data());
+                        mydata.reset_response_data();
+
                         controller.clearscreen()
                         sequence4.data.current_trial += 1;
+
                         sequence4.reset_settings(4)
                         controller.transition_screen_black();
                         setTimeout(sequence4.run, mydata.blackout_time*1000);
@@ -449,6 +596,13 @@ $(document).ready(function(){
                     controller.score_take('#console2')
                     controller.update_scores();
                     if (controller.check_scores() == false){
+
+                        //controller.clear_time_stamp();
+
+                        mydata.update_response_data();
+                        mydata.push_data_to_final(mydata.create_data());
+                        mydata.reset_response_data();
+
                         controller.clearscreen()
                         sequence4.data.current_trial += 1;
                         sequence4.reset_settings(4)
@@ -487,18 +641,9 @@ var controller = {
 
 
     //Timer helpers----------//
-    timer_start: function(){ //sets t1 to start time
-        mydata.t1 = performance.now();
-    },
 
-    timer_end: function(){ //sets t2 to end time
-        mydata.t2 = performance.now();
-    },
 
-    time_reset: function(){
-    mydata.t1 = 0;
-    mydata.t2 = 0;
-    },
+
     //---------------------------//
 
     score_take: function(name){ //take away 1 from score
@@ -518,6 +663,7 @@ var controller = {
     check_scores: function(){ //Boolean
 
         if (mydata.score1 > 0 && mydata.score2 > 0) {
+
             return true;
         } else {
             return false;
@@ -525,15 +671,22 @@ var controller = {
     },
 
     switch_sides: function() {
-            if (mydata.response.position_ipad == 'left') {
-                mydata.response.position_ipad = 'right';
+            //console.log("Ipad pos: " + mydata.position_ipad);
+            if (mydata.position_ipad == 'left') {
+                mydata.update_position('right');
+                mydata.position_ipad = 'right';
+                //mydata.position_ipad = 'right';
                 $('#console1').css("float", "right");
                 $('#console2').css("float", "left");
-
+                console.log("if");
+                console.log("Ipad pos: " + mydata.position_ipad)
             } else {
-                mydata.response.position_ipad = 'left'; //doesnt update on its own :(
+                mydata.update_position('left')//doesnt update on its own :(
+                mydata.position_ipad = 'left';
                 $('#console1').css("float", "left");
                 $('#console2').css("float", "right");
+                console.log("else");
+                console.log("Ipad pos: " + mydata.position_ipad)
 
             }
     },
@@ -557,24 +710,52 @@ var controller = {
             $('body').css('background-color', "#2C3E50");
             setTimeout(function(){$('body').css('background-color', "#FFFFFF")}, mydata.blackout_time*1000);
     },
+    normalizer: function(){
+    mydata.update_position("left");
+    $('#console1').css("float", 'left');
+    $('#console2').css("float", 'right');
 
+    },
+    time_stamp: function(){
+        mydata.response.time_stamp.push(String((performance.now()/1000)));
+        console.log("Is time stamp working");
+        //console.log(mydata.response.time_stamp);
 
-
+    },
+    clear_time_stamp: function(){
+        mydata.time_stamp = [];
+    },
 
 };
+
+
+
+
 
 
 //---------STARTUP COMMAND BOX-------//
 controller.clearscreen();
 mydata.score1 = 1;
-mydata.score2 = 1;
+mydata.score1 = 1;
 controller.update_scores();
 mydata.initialize();
-console.log(mydata.getData());
+//console.log(mydata.getData());
+
 app.add_events(sequence1)
+//console.log(csvContent);
 app.run();
 
+//console.log(mydata.create_data(mydata.test));
+//console.log(mydata.create_data(mydata.test));
+
+
+
 //------------------------------------//
+
+//------Data_Download----------//
+
+//-----------------------------//
+
 
 });
 </script>
