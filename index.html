@@ -6,18 +6,17 @@
     <title>Titrate Assessment</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.10.6/xlsx.min.js"></script>
-    <script src="http://cdn.jsdelivr.net/alasql/0.3/alasql.min.js"></script>
     <link rel="stylesheet" href="stylesheet.css" type="text/css">
 </head>
 <body>
 
     <div id="console1">
-        <img src="images/ipad_Gideon.gif" class="myipad" alt="ipad">
+        <img src="images/IPad_pic.gif" class="myipad" alt="ipad">
         <div id="score1" class="score" >&bull;</div>
 
     </div>
     <div id="console2">
-        <img src="images/book_Gideon.gif" class="mybook" alt="book">
+        <img src="images/Book_pic.gif" class="mybook" alt="book">
         <div id="score2" class="score" >&bull;</div>
     </div>
 
@@ -27,7 +26,7 @@
 $(document).ready(function(){
     var session_start = performance.now();
     $(document).keyup(function(e){
-        var tm = performance.now(); //needed to have the first one;
+        //var tm = performance.now(); //needed to have the first one;
         console.log(e.keyCode);
         mydata.keypress = e.keyCode;
 
@@ -96,7 +95,7 @@ $(document).ready(function(){
         trial: 0, //FC, BOTH, first_time, [1,2,3,4]
         fr_value: null,
         position_ipad: $('#console1').css('float'),
-        responses_ipad: null,
+        responses_ipad: 0,
         time_stamp: [], //stamp each action, append to a list [#,#,#,#]
         time_trial: null, //how long was each trial/sequence
         time_session: null, //how long did the session last
@@ -181,7 +180,7 @@ $(document).ready(function(){
                 console.log('Trial:' + mydata.trial);
                 console.log("My session: " + mydata.response.time_session);
                 console.log('Mydatat1: ' + mydata.t1);
-                mydata.response.time_stamp.push(mydata.response.time_trial); 
+                mydata.response.time_stamp.push(mydata.response.time_trial);
             } else {
                 mydata.response.time_trial = (mydata.response.time_session - mydata.t1);
                 mydata.t1 = mydata.response.time_session;
@@ -259,6 +258,7 @@ $(document).ready(function(){
                 mydata.switch_sides = data['key3'];
                 mydata.first_time = data['key4'];
                 mydata.first_time_max_amount = data['key5'];
+                mydata.session = data['key6']
                 console.log("Initialized menu");
                 },
 
@@ -371,7 +371,7 @@ $(document).ready(function(){
                     } else if (sequence1.data.current_trial == 2) {
                         sequence1.ipad_alone();
                     } else {
-                        controller.normalizer();
+                        //controller.normalizer();
                         sequence2.run();
                     };
                 }
@@ -406,7 +406,11 @@ $(document).ready(function(){
         },
         run: function() {
                 sequence2.reset_settings()
+                console.log("Switcher: "+ mydata.switch_sides);
+                console.log("ipad pos: "+ mydata.position_ipad)
                 controller.normalizer();
+                console.log("Switcher: "+ mydata.switch_sides);
+                console.log("ipad pos: "+ mydata.position_ipad)
                 if (mydata.switch_sides == 2) {
                     controller.switch_sides();
                 }
@@ -707,11 +711,12 @@ var controller = {
             $('#console2').off();
     },
     transition_screen_black: function(){
-            $('body').css('background-color', "#2C3E50");
+            $('body').css('background-color', "#000000");
             setTimeout(function(){$('body').css('background-color', "#FFFFFF")}, mydata.blackout_time*1000);
     },
     normalizer: function(){
     mydata.update_position("left");
+    mydata.position_ipad = "left";
     $('#console1').css("float", 'left');
     $('#console2').css("float", 'right');
 
