@@ -33,7 +33,6 @@ $(document).ready(function(){
         var con1side = $('#console1').css('float')
         var con2side = $('#console2').css('float')
 
-
         if (con1side == 'left' && e.keyCode == 37 && $('#console1').is(":visible")) {
             $('#console1').click();
             controller.time_stamp();
@@ -436,6 +435,7 @@ $(document).ready(function(){
                             sequence2.reset_settings();
                             //sequence2.nextseq();
                             controller.transition_screen_black();
+
                             setTimeout(sequence2.nextseq, mydata.blackout_time*1000);
 
 
@@ -460,13 +460,14 @@ $(document).ready(function(){
                             controller.clearscreen();
                             sequence2.reset_settings();
                             controller.transition_screen_black();
+
                             setTimeout(sequence2.nextseq , mydata.blackout_time*1000);
                         }
                 });
                 },
         nextseq: function(){
             controller.normalizer();
-            if (mydata.first_time == "Yes"){
+            if (mydata.first_time == "Yes" || mydata.first_time == 'yes'){
                 sequence3.run();
             } else {
 
@@ -482,6 +483,10 @@ $(document).ready(function(){
 
 
     var sequence3 = {
+        settings: {
+
+
+        },
         reset_settings: function(num){
                 controller.clearscreen()
                 controller.unbind_all()
@@ -504,6 +509,8 @@ $(document).ready(function(){
         },
 
         run: function() {
+                //mydata.trial += 1;
+
 
                 sequence3.reset_settings(1)
                 sequence3.ipad_alone(sequence3.ipad_alone, sequence4.run);
@@ -516,11 +523,16 @@ $(document).ready(function(){
                 controller.update_scores();
 
                 if (controller.check_scores() == false){
+
+                    sequence3.settings.mys += 1;
                     console.log("hello");
                     controller.clearscreen();
                     sequence3.reset_settings(mydata.first_time_max_amount);
                     //callback(func);
                     controller.transition_screen_black();
+                    mydata.reset_response_data();
+
+
                     setTimeout(function(){callback(func)}  , mydata.blackout_time*1000);
 
 
@@ -558,6 +570,7 @@ $(document).ready(function(){
                 };
 
                 if (sequence4.data.current_trial == 1) {
+
                     console.log("Normalzied Ipad to left side");
                     controller.normalizer();
 
@@ -722,11 +735,17 @@ var controller = {
 
     },
     time_stamp: function(){
+
+
+        console.log("My Trial:" + mydata.trial);
+        console.log('Last stamp was: ' + mydata.response.time_stamp );
+        console.log("My seq settings power: " + sequence3.settings.power);
+
         mydata.response.time_stamp.push(String((performance.now()/1000)));
         console.log("Is time stamp working");
-        //console.log(mydata.response.time_stamp);
 
     },
+
     clear_time_stamp: function(){
         mydata.time_stamp = [];
     },
@@ -745,7 +764,7 @@ mydata.score1 = 1;
 controller.update_scores();
 mydata.initialize();
 //console.log(mydata.getData());
-
+sequence3.settings.power = 0;
 app.add_events(sequence1)
 //console.log(csvContent);
 app.run();
