@@ -30,6 +30,8 @@
             <br>
             Session #:<input type="number" name="session">
             <br>
+            # of Fr Trials:<input type="number" name="how_many_fr_trials">
+            <br>
 
 
             <button type="button" id="Submit_button">Submit</button>
@@ -48,6 +50,7 @@
      var first_time = null;
      var first_time_max_amount = null;
      var session = null;
+     var how_many_fr_trials = null;
 
      //On button press, grab entry field values and store in variables
      $("#Submit_button").click(function(){
@@ -60,6 +63,7 @@
         first_time = $('[name=first_time]').val();
         first_time_max_amount = $('[name=maxamount]').val();
         session = $('[name=session]').val();
+        how_many_fr_trials = $('[name=how_many_fr_trials]').val();
 
         //first_val = $('[name=maxamo]').val();
 
@@ -72,6 +76,7 @@
             key4: first_time,
             key5: first_time_max_amount,
             key6: session,
+            key7: how_many_fr_trials,
         };
 
         //hide all pages I don't need

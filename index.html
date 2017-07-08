@@ -30,8 +30,9 @@ $(document).ready(function(){
         console.log(e.keyCode);
         mydata.keypress = e.keyCode;
 
-        var con1side = $('#console1').css('float')
-        var con2side = $('#console2').css('float')
+        var con1side = $('#console1').css('float');
+        var con2side = $('#console2').css('float');
+        //var last_stamp = null; //each key press should update this variable
 
         if (con1side == 'left' && e.keyCode == 37 && $('#console1').is(":visible")) {
             $('#console1').click();
@@ -39,14 +40,16 @@ $(document).ready(function(){
         } else if (con2side == 'left' && e.keyCode == 37 && $('#console2').is(":visible")) {
             $('#console2').click();
             controller.time_stamp();
+
         } else if (con1side == 'right' && e.keyCode == 39 && $('#console1').is(":visible")) {
             $('#console1').click();
             controller.time_stamp();
-        } else if (con2side == 'right' && e.keyCode == 39 && $("#console2").is(":visible")){
+        } else if (con2side == 'right' && e.keyCode == 39 && $("#console2").is(":visible")) {
             $('#console2').click();
             controller.time_stamp();
 
         }
+
 
     });
 //---------------Titrate Assessment-----------//
@@ -87,6 +90,7 @@ $(document).ready(function(){
         switch_sides: 1, //1 for ipad on left for each trial, 2 for book on left
         first_time: null,
         first_time_max_amount: null,
+        how_many_fr_trials: null,
 
 
         child_id: null, //initial
@@ -105,6 +109,7 @@ $(document).ready(function(){
         //Session
         sessionstarttime: 0,
         sessionendtime: 0,
+        last_stamp: 0,
         //Trials
         t1:0, //Start time
         t2:0, //End time
@@ -149,7 +154,7 @@ $(document).ready(function(){
             //mydata.response.fr_value = null;
             mydata.response.position_ipad = null;
             mydata.response.responses_ipad = null;
-            mydata.response.time_stamp = [];
+            mydata.response.time_stamp = []; //an array of time stamps
             mydata.response.time_trial = null;
             mydata.response.time_session = null;
         },
@@ -179,7 +184,15 @@ $(document).ready(function(){
                 console.log('Trial:' + mydata.trial);
                 console.log("My session: " + mydata.response.time_session);
                 console.log('Mydatat1: ' + mydata.t1);
-                mydata.response.time_stamp.push(mydata.response.time_trial);
+                //mydata.response.time_stamp.push(mydata.response.time_trial);
+                var temp = (performance.now()/1000).toFixed(2);
+                mydata.response.time_stamp.push(temp);
+                console.log("!!!! My initial time_stamp: " + mydata.response.time_stamp);
+                //Changes //
+
+
+
+                //--------//
             } else {
                 mydata.response.time_trial = (mydata.response.time_session - mydata.t1);
                 mydata.t1 = mydata.response.time_session;
@@ -204,9 +217,9 @@ $(document).ready(function(){
             var data = [];
 
             //Turns time_stamp array into csv format
-
+            console.log("BEFORE; MY DATA: "+ mydata.response.time_stamp);
             mydata.response.time_stamp = mydata.response.time_stamp.join(" : ");
-
+            console.log("MY DATA ISSSS: " + mydata.response.time_stamp);
             //Results in object variables
             var realobj = Object.values(mydata.response);
             for(i=0; i < realobj.length; i++)
@@ -257,7 +270,8 @@ $(document).ready(function(){
                 mydata.switch_sides = data['key3'];
                 mydata.first_time = data['key4'];
                 mydata.first_time_max_amount = data['key5'];
-                mydata.session = data['key6']
+                mydata.session = data['key6'];
+                mydata.how_many_fr_trials = data['key7'];
                 console.log("Initialized menu");
                 },
 
@@ -553,7 +567,7 @@ $(document).ready(function(){
             current_trial: 1,
         },
 
-        reset_settings: function(num){
+        reset_settings: function(){
                 controller.clearscreen()
                 controller.unbind_all()
                 mydata.score1 = mydata.fr_value;
@@ -563,7 +577,7 @@ $(document).ready(function(){
 
         run: function() {
 
-                if (sequence4.data.current_trial > 4) {
+                if (sequence4.data.current_trial > mydata.how_many_fr_trials) {
                     console.log("downloading data");
                     mydata.download_csv();
                     return;
@@ -581,7 +595,7 @@ $(document).ready(function(){
                     controller.switch_sides();
                 };
 
-                sequence4.reset_settings(4)
+                sequence4.reset_settings()
                 $('#console1').show()
                 $('#console1').click(function(){
                     controller.score_take('#console1')
@@ -599,7 +613,7 @@ $(document).ready(function(){
                         controller.clearscreen()
                         sequence4.data.current_trial += 1;
 
-                        sequence4.reset_settings(4)
+                        sequence4.reset_settings()
                         controller.transition_screen_black();
                         setTimeout(sequence4.run, mydata.blackout_time*1000);
 
@@ -622,7 +636,7 @@ $(document).ready(function(){
 
                         controller.clearscreen()
                         sequence4.data.current_trial += 1;
-                        sequence4.reset_settings(4)
+                        sequence4.reset_settings()
                         controller.transition_screen_black();
                         setTimeout(sequence4.run, mydata.blackout_time*1000);
 
@@ -736,13 +750,17 @@ var controller = {
     },
     time_stamp: function(){
 
-
-        console.log("My Trial:" + mydata.trial);
-        console.log('Last stamp was: ' + mydata.response.time_stamp );
-        console.log("My seq settings power: " + sequence3.settings.power);
+        //var time;
+        //console.log("My Trial:" + mydata.trial);
+        //console.log('Last stamp was: ' + mydata.response.time_stamp );
+        //console.log("My seq settings power: " + sequence3.settings.power);
+        //time = (performance.now()/1000).toFixed(2);
+        //mydata.response.time_stamp.push(time);
 
         mydata.response.time_stamp.push(String((performance.now()/1000)));
-        console.log("Is time stamp working");
+        mydata.last_stamp = (performance.now()/1000).toFixed(2);
+        console.log("My last stamp: (" + mydata.last_stamp + ")s");
+        //console.log("Is time stamp working");
 
     },
 
