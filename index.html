@@ -26,27 +26,27 @@
 $(document).ready(function(){
     var session_start = performance.now();
     $(document).keyup(function(e){
-        //var tm = performance.now(); //needed to have the first one;
         console.log(e.keyCode);
         mydata.keypress = e.keyCode;
 
         var con1side = $('#console1').css('float');
         var con2side = $('#console2').css('float');
-        //var last_stamp = null; //each key press should update this variable
+        var time = (performance.now()/1000).toFixed(2);
+
 
         if (con1side == 'left' && e.keyCode == 37 && $('#console1').is(":visible")) {
+            controller.time_stamp(time);
             $('#console1').click();
-            controller.time_stamp();
         } else if (con2side == 'left' && e.keyCode == 37 && $('#console2').is(":visible")) {
+            controller.time_stamp(time);
             $('#console2').click();
-            controller.time_stamp();
 
         } else if (con1side == 'right' && e.keyCode == 39 && $('#console1').is(":visible")) {
+            controller.time_stamp(time);
             $('#console1').click();
-            controller.time_stamp();
         } else if (con2side == 'right' && e.keyCode == 39 && $("#console2").is(":visible")) {
+            controller.time_stamp(time);
             $('#console2').click();
-            controller.time_stamp();
 
         }
 
@@ -100,7 +100,7 @@ $(document).ready(function(){
         position_ipad: $('#console1').css('float'),
         responses_ipad: 0,
         time_stamp: [], //stamp each action, append to a list [#,#,#,#]
-        time_trial: null, //how long was each trial/sequence
+        time_trial: 0, //how long was each trial/sequence
         time_session: null, //how long did the session last
 
         //InProgress
@@ -110,6 +110,7 @@ $(document).ready(function(){
         sessionstarttime: 0,
         sessionendtime: 0,
         last_stamp: 0,
+        old_stamp: 0,
         //Trials
         t1:0, //Start time
         t2:0, //End time
@@ -131,7 +132,7 @@ $(document).ready(function(){
             position_ipad: null,
             responses_ipad: null,
             time_stamp: [], //stamp each action, append to a list [#,#,#,#]
-            time_trial: null, //how long was each trial/sequence
+            time_trial: 0, //how long was each trial/sequence
             time_session: null, //how long did the session last
         },
 
@@ -148,66 +149,26 @@ $(document).ready(function(){
         reset_response_data: function(){
             mydata.responses_ipad = 0;
             controller.clear_time_stamp();
-            //mydata.response.child_id = null;
-            //mydata.response.session = null;
-            //mydata.response.trial = null;
-            //mydata.response.fr_value = null;
             mydata.response.position_ipad = null;
             mydata.response.responses_ipad = null;
             mydata.response.time_stamp = []; //an array of time stamps
-            mydata.response.time_trial = null;
             mydata.response.time_session = null;
         },
 
 
         //takes in response data
         update_response_data: function(){
-            mydata.trial += 1;
 
-
-            //mydata.responses_ipad = mydata.fr_value - mydata.score1;
-
-            //console.log("Update_response_data: " + mydata.final_data);
-            mydata.response.child_id = mydata.child_id;
-            mydata.response.session =  mydata.session;
-            mydata.response.trial = mydata.trial;
-            mydata.response.fr_value = mydata.fr_value;
-            mydata.response.position_ipad = $('#console1').css('float');
-            mydata.response.responses_ipad = mydata.responses_ipad;
-            //mydata.response.time_stamp = mydata.time_stamp;
-            //mydata.response.time_trial = mydata.time_trial;
-            mydata.response.time_session = (performance.now() - session_start)/1000;
-
-            if (mydata.trial == 1){
-                mydata.response.time_trial = mydata.response.time_session;
-                mydata.t1 = mydata.response.time_session;
-                console.log('Trial:' + mydata.trial);
-                console.log("My session: " + mydata.response.time_session);
-                console.log('Mydatat1: ' + mydata.t1);
-                //mydata.response.time_stamp.push(mydata.response.time_trial);
-                var temp = (performance.now()/1000).toFixed(2);
-                mydata.response.time_stamp.push(temp);
-                console.log("!!!! My initial time_stamp: " + mydata.response.time_stamp);
-                //Changes //
-
-
-
-                //--------//
-            } else {
-                mydata.response.time_trial = (mydata.response.time_session - mydata.t1);
-                mydata.t1 = mydata.response.time_session;
-
-                console.log('Trial:' + mydata.trial);
-                console.log("My session: " + mydata.response.time_session);
-                console.log('Mydatat1: ' + mydata.t1);
-                console.log('myTrial:' + mydata.response.time_trial);
-                mydata.t1 = mydata.response.time_trial;
-
-            }
-
-
-            //console.log("Update_response_data: " + mydata.final_data);
-
+            mydata.trial += 1; //good
+            mydata.response.child_id = mydata.child_id; //good
+            mydata.response.session =  mydata.session; //good
+            mydata.response.trial = mydata.trial; //good
+            mydata.response.fr_value = mydata.fr_value; //good
+            mydata.response.position_ipad = $('#console1').css('float'); //good
+            mydata.response.responses_ipad = mydata.responses_ipad; //good
+            mydata.response.time_session = mydata.last_stamp;
+            mydata.response.time_trial= mydata.last_stamp - mydata.old_stamp;
+            mydata.old_stamp = mydata.last_stamp;
         },
 
 
@@ -284,16 +245,9 @@ $(document).ready(function(){
                 switch_sides: mydata.switch_sides,
                 first_time: mydata.first_time,
                 first_time_max_amount: mydata.first_time_max_amount,
-
             };
-
             return response;
-
         },
-
-
-
-
     };
 
 //------------- App Data End -------------//
@@ -328,8 +282,6 @@ $(document).ready(function(){
                 mydata.responses_ipad += 1;
                 if (controller.check_scores() == false){
 
-
-                    //controller.clear_time_stamp();
                     mydata.update_response_data();
                     mydata.push_data_to_final(mydata.create_data());
                     mydata.reset_response_data();
@@ -345,13 +297,11 @@ $(document).ready(function(){
 
         book_alone: function(){
             $('#console2').show()
-            $('#console2').click(function(){
+            $('#console2').click(function(time){
 
                 controller.score_take('#console2')
                 controller.update_scores();
                 if (controller.check_scores() == false){
-
-                    //controller.clear_time_stamp();
 
                     mydata.update_response_data();
                     mydata.push_data_to_final(mydata.create_data());
@@ -384,7 +334,6 @@ $(document).ready(function(){
                     } else if (sequence1.data.current_trial == 2) {
                         sequence1.ipad_alone();
                     } else {
-                        //controller.normalizer();
                         sequence2.run();
                     };
                 }
@@ -432,14 +381,12 @@ $(document).ready(function(){
 
                 $('#console1').show()
                 $('#console1').click(function(){
-                    //if (mydata.keypress == mydata.con1key) {
                         controller.score_take('#console1')
                         controller.update_scores();
                         mydata.responses_ipad += 1;
 
                         if (controller.check_scores() == false){
 
-                            //controller.clear_time_stamp();
 
                             mydata.update_response_data();
                             mydata.push_data_to_final(mydata.create_data());
@@ -447,7 +394,6 @@ $(document).ready(function(){
 
                             controller.clearscreen();
                             sequence2.reset_settings();
-                            //sequence2.nextseq();
                             controller.transition_screen_black();
 
                             setTimeout(sequence2.nextseq, mydata.blackout_time*1000);
@@ -460,12 +406,9 @@ $(document).ready(function(){
 
                 $('#console2').show()
                 $('#console2').click(function(){
-                    //if (mydata.keypress == mydata.con2key) {
                         controller.score_take('#console2')
                         controller.update_scores();
                         if (controller.check_scores() == false){
-
-                            //controller.clear_time_stamp();
 
                             mydata.update_response_data();
                             mydata.push_data_to_final(mydata.create_data());
@@ -482,6 +425,7 @@ $(document).ready(function(){
         nextseq: function(){
             controller.normalizer();
             if (mydata.first_time == "Yes" || mydata.first_time == 'yes'){
+                mydata.trial = "min/max";
                 sequence3.run();
             } else {
 
@@ -505,7 +449,6 @@ $(document).ready(function(){
                 controller.clearscreen()
                 controller.unbind_all()
                 mydata.score1 = num;
-                //mydata.switch_sides;
                 controller.update_scores();
         },
 
@@ -523,7 +466,6 @@ $(document).ready(function(){
         },
 
         run: function() {
-                //mydata.trial += 1;
 
 
                 sequence3.reset_settings(1)
@@ -542,7 +484,6 @@ $(document).ready(function(){
                     console.log("hello");
                     controller.clearscreen();
                     sequence3.reset_settings(mydata.first_time_max_amount);
-                    //callback(func);
                     controller.transition_screen_black();
                     mydata.reset_response_data();
 
@@ -576,7 +517,10 @@ $(document).ready(function(){
         },
 
         run: function() {
-
+                if (mydata.trial == 'min/max'){
+                    console.log("Changing trial to 4");
+                    mydata.trial = 3;
+                }
                 if (sequence4.data.current_trial > mydata.how_many_fr_trials) {
                     console.log("downloading data");
                     mydata.download_csv();
@@ -604,8 +548,6 @@ $(document).ready(function(){
 
                     if (controller.check_scores() == false){
 
-                        //controller.clear_time_stamp();
-
                         mydata.update_response_data();
                         mydata.push_data_to_final(mydata.create_data());
                         mydata.reset_response_data();
@@ -627,8 +569,6 @@ $(document).ready(function(){
                     controller.score_take('#console2')
                     controller.update_scores();
                     if (controller.check_scores() == false){
-
-                        //controller.clear_time_stamp();
 
                         mydata.update_response_data();
                         mydata.push_data_to_final(mydata.create_data());
@@ -670,13 +610,6 @@ var controller = {
         $('#score2').html(str2);
     },
 
-
-    //Timer helpers----------//
-
-
-
-    //---------------------------//
-
     score_take: function(name){ //take away 1 from score
         //takes in score in the form of 'mydata.scoreNUM'
 
@@ -702,11 +635,9 @@ var controller = {
     },
 
     switch_sides: function() {
-            //console.log("Ipad pos: " + mydata.position_ipad);
             if (mydata.position_ipad == 'left') {
                 mydata.update_position('right');
                 mydata.position_ipad = 'right';
-                //mydata.position_ipad = 'right';
                 $('#console1').css("float", "right");
                 $('#console2').css("float", "left");
                 console.log("if");
@@ -748,19 +679,13 @@ var controller = {
     $('#console2').css("float", 'right');
 
     },
-    time_stamp: function(){
+    time_stamp: function(t){
+        if (mydata.trial == "min/max") {
+            return null;
+        }
+        mydata.last_stamp = t; //works
+        mydata.response.time_stamp.push(String(t));
 
-        //var time;
-        //console.log("My Trial:" + mydata.trial);
-        //console.log('Last stamp was: ' + mydata.response.time_stamp );
-        //console.log("My seq settings power: " + sequence3.settings.power);
-        //time = (performance.now()/1000).toFixed(2);
-        //mydata.response.time_stamp.push(time);
-
-        mydata.response.time_stamp.push(String((performance.now()/1000)));
-        mydata.last_stamp = (performance.now()/1000).toFixed(2);
-        console.log("My last stamp: (" + mydata.last_stamp + ")s");
-        //console.log("Is time stamp working");
 
     },
 
@@ -771,32 +696,16 @@ var controller = {
 };
 
 
-
-
-
-
 //---------STARTUP COMMAND BOX-------//
 controller.clearscreen();
 mydata.score1 = 1;
 mydata.score1 = 1;
 controller.update_scores();
 mydata.initialize();
-//console.log(mydata.getData());
 sequence3.settings.power = 0;
 app.add_events(sequence1)
-//console.log(csvContent);
 app.run();
-
-//console.log(mydata.create_data(mydata.test));
-//console.log(mydata.create_data(mydata.test));
-
-
-
 //------------------------------------//
-
-//------Data_Download----------//
-
-//-----------------------------//
 
 
 });
